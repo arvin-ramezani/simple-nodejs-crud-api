@@ -4,6 +4,7 @@ import { validationResult } from 'express-validator';
 import { Student, StudentAttrs } from '@/models/student.model';
 import { RequestValidationError } from '@/errors/request-validation.error';
 import { NotFoundError } from '@/errors/not-found.error';
+import { ConflictError } from '@/errors/conflict.error';
 
 interface CreateStudentRequest extends Request {
   body: StudentAttrs;
@@ -46,6 +47,16 @@ export const createStudent = async (
   }
 
   const studentToCreate = req.body;
+
+  const existStudent = await Student.findOne({
+    nationalCode: studentToCreate.nationalCode,
+  });
+
+  if (existStudent) {
+    throw new ConflictError(
+      `Student with NationalCode ${studentToCreate.nationalCode} already exists`
+    );
+  }
 
   const newStudent = Student.build(studentToCreate);
   await newStudent.save();
