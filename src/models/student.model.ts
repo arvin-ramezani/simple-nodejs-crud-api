@@ -82,3 +82,84 @@ const Student =
   mongoose.model<StudentDoc, StudentModel>('Food', studentSchema);
 
 export { Student };
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CreateStudentInput:
+ *       type: object
+ *       required:
+ *         - firstName
+ *         - lastName
+ *         - nationalCode
+ *         - phoneNumber
+ *         - fatherName
+ *         - schoolName
+ *         - educationalLevel
+ *       properties:
+ *         firstName:
+ *           type: string
+ *           default: John
+ *         lastName:
+ *           type: string
+ *           default: Doe
+ *         nationalCode:
+ *           type: string
+ *           default: 9876543210
+ *         phoneNumber:
+ *           type: string
+ *           default: 9876543210
+ *         fatherName:
+ *           type: string
+ *           default: Jack
+ *         schoolName:
+ *           type: string
+ *           default: ABC School
+ *         educationalLevel:
+ *           type: string
+ *           default: Middle School
+ *     EditStudentInput:
+ *       type: object
+ *       properties:
+ *         firstName:
+ *           type: string
+ *           default: Jane
+ *         lastName:
+ *           type: string
+ *           default: Smith
+ *         nationalCode:
+ *           type: string
+ *           default: 9876543210
+ *         phoneNumber:
+ *           type: string
+ *           default: 9876543210
+ *         fatherName:
+ *           type: string
+ *           default: John
+ *         schoolName:
+ *           type: string
+ *           default: XYZ School
+ *         educationalLevel:
+ *           type: string
+ *           default: Middle School
+ *     StudentResponse:
+ *       type: object
+ *       properties:
+ *         firstName:
+ *           type: string
+ *         lastName:
+ *           type: string
+ *         nationalCode:
+ *           type: string
+ *         phoneNumber:
+ *           type: string
+ *         fatherName:
+ *           type: string
+ *         schoolName:
+ *           type: string
+ *         educationalLevel:
+ *           type: string
+ *         _id:
+ *           type: string
+ */
