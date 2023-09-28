@@ -11,7 +11,11 @@ export const seedStudents = async (req: Request, res: Response) => {
     return newStudent.save();
   });
 
-  await Promise.all(savePromises);
+  try {
+    await Promise.all(savePromises);
+  } catch (error) {
+    console.log(error, 'error');
+  }
 
   return res.status(201).send('Seed students successfully.');
 };

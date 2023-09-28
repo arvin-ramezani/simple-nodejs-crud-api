@@ -10,6 +10,7 @@ import seedStudentsRoutes from '@/routes/seed-students.routes';
 import { errorHandler } from './middlewares/error-handler.middleware';
 import { NotFoundError } from './errors/not-found.error';
 import swaggerDocs from '@/utils/swagger';
+import validateDbEnvVariables from './utils/validate-db-env';
 
 dotenv.config();
 
@@ -30,15 +31,20 @@ app.use(errorHandler);
 
 async function start() {
   try {
-    await mongoose.connect(process.env.DB_CONN_STRING!);
+    validateDbEnvVariables();
+
+    await mongoose.connect(process.env.DB_CONN_STRING!, {
+      autoIndex: true,
+    });
+
     console.log('Connected to MongoDB');
+
+    app.listen(port, () => {
+      console.log(`Server started at http://localhost:${port}`);
+    });
   } catch (error) {
     console.error('Database connection failed', error);
   }
-
-  app.listen(port, () => {
-    console.log(`Server started at http://localhost:${port}`);
-  });
 }
 
 start();

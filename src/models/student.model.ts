@@ -41,6 +41,7 @@ const studentSchema = new mongoose.Schema(
     nationalCode: {
       type: String,
       required: true,
+      unique: true,
     },
     phoneNumber: {
       type: String,
