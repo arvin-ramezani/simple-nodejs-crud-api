@@ -43,11 +43,12 @@ yarn dev
 
 The following routes are available for accessing the API:
 
-1. **GET: /api** - Retrieves all students.
-2. **GET: /api/:id** - Retrieves a student with a specific ID.
-3. **POST: /api** - Creates a new student.
-4. **PATCH: /api/:id** - Edits an existing student.
-5. **DELETE: /api/:id** - Deletes a student by ID.
+1. **POST: /api/seed-students** - Seeds the database with 21 dummy students. (To populate the database with dummy data)
+2. **GET: /api** - Retrieves all students.
+3. **GET: /api/:id** - Retrieves a student with a specific ID.
+4. **POST: /api** - Creates a new student.
+5. **PATCH: /api/:id** - Edits an existing student.
+6. **DELETE: /api/:id** - Deletes a student by ID.
 
 Note: Replace `:id` with the actual student ID in the URL.
 
