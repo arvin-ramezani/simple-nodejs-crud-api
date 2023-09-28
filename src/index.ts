@@ -6,6 +6,7 @@ import 'module-alias/register';
 import 'express-async-errors';
 
 import studentsRoutes from '@/routes/students.routes';
+import seedStudentsRoutes from '@/routes/seed-students.routes';
 import { errorHandler } from './middlewares/error-handler.middleware';
 import { NotFoundError } from './errors/not-found.error';
 import swaggerDocs from '@/utils/swagger';
@@ -18,6 +19,7 @@ app.use(cors());
 
 const port = process.env.PORT || 3000;
 
+app.use('/api/seed-students', seedStudentsRoutes);
 app.use('/api', studentsRoutes);
 swaggerDocs(app, +port);
 

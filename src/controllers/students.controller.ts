@@ -1,12 +1,9 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { ObjectId } from 'mongodb';
 
-import { collections } from '@/utils/connectToDB';
 import { Student, StudentAttrs } from '@/models/student.model';
 import { RequestValidationError } from '@/errors/request-validation.error';
 import { NotFoundError } from '@/errors/not-found.error';
-import { ServerError } from '@/errors/server.error';
 
 interface CreateStudentRequest extends Request {
   body: StudentAttrs;
