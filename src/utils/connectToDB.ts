@@ -6,9 +6,15 @@ export const collections: { students?: Collection } = {};
 export async function connectToDatabase() {
   validateDbEnvVariables();
 
-  const client: MongoClient = new MongoClient(process.env.DB_CONN_STRING!);
+  const client: MongoClient = new MongoClient(process.env.DB_CONN_STRING!, {
+    // useUnifiedTopology: true,
+    // useNewUrlParser: true,
+    // useCreateIndex: true,
+    // useFindAndModify: false,
+  });
 
   await client.connect();
+
 
   const db: Db = client.db(process.env.DB_NAME);
 
@@ -17,6 +23,8 @@ export async function connectToDatabase() {
   );
 
   collections.students = studentsCollection;
+
+  
 
   console.log(
     `Successfully connected to database: ${db.databaseName} 

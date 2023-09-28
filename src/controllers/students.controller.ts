@@ -3,21 +3,22 @@ import { validationResult } from 'express-validator';
 import { ObjectId } from 'mongodb';
 
 import { collections } from '@/utils/connectToDB';
-import Student from '@/models/student.model';
+import { Student, StudentAttrs } from '@/models/student.model';
 import { RequestValidationError } from '@/errors/request-validation.error';
 import { NotFoundError } from '@/errors/not-found.error';
 import { ServerError } from '@/errors/server.error';
 
 interface CreateStudentRequest extends Request {
-  body: Student;
+  body: StudentAttrs;
 }
 
 interface EditStudentRequest extends Request {
-  body: Partial<Student>;
+  body: Partial<StudentAttrs>;
 }
 
 export const getAllStudents = async (_req: Request, res: Response) => {
-  const studentsList = await collections.students!.find({}).toArray();
+  // const studentsList = await collections.students!.find({}).toArray();
+  const studentsList = await Student.find({});
 
   res.status(200).json(studentsList);
 };
@@ -29,11 +30,9 @@ export const getStudent = async (req: Request, res: Response) => {
     throw new RequestValidationError(validationErrors.array());
   }
 
-  const id = new ObjectId(req.params.id);
+  const id = req.params.id;
 
-  const student = await collections.students!.findOne({
-    _id: id,
-  });
+  const student = await Student.findById(id);
 
   if (!student) throw new NotFoundError(`Student with id ${id} not found.`);
 
@@ -52,12 +51,10 @@ export const createStudent = async (
 
   const studentToCreate = req.body;
 
-  const result = await collections.students!.insertOne(studentToCreate);
+  const newStudent = Student.build(studentToCreate);
+  await newStudent.save();
 
-  if (!result || !result.insertedId)
-    throw new ServerError('Failed to create student.');
-
-  res.status(201).json(studentToCreate);
+  res.status(201).json(newStudent);
 };
 
 export const editStudents = async (req: EditStudentRequest, res: Response) => {
@@ -67,26 +64,37 @@ export const editStudents = async (req: EditStudentRequest, res: Response) => {
     throw new RequestValidationError(validationErrors.array());
   }
 
-  const id = new ObjectId(req.params.id);
+  const id = req.params.id;
   const studentToEdit = req.body;
 
-  const existingStudent = await collections.students!.findOne({ _id: id });
+  const existingStudent = await Student.findById(id);
 
   if (!existingStudent)
     throw new NotFoundError(`Student with id ${id} not found.`);
 
-  const result = await collections.students!.updateOne(
-    { _id: existingStudent._id },
-    { $set: studentToEdit }
-  );
+  existingStudent.firstName =
+    studentToEdit.firstName || existingStudent.firstName;
 
-  if (!result || result.modifiedCount < 1) {
-    throw new ServerError(`Failed to update student with id ${id}.`);
-  }
+  existingStudent.lastName = studentToEdit.lastName || existingStudent.lastName;
 
-  const editedStudent = { ...existingStudent, ...studentToEdit };
+  existingStudent.nationalCode =
+    studentToEdit.nationalCode || existingStudent.nationalCode;
 
-  res.status(200).json(editedStudent);
+  existingStudent.phoneNumber =
+    studentToEdit.phoneNumber || existingStudent.phoneNumber;
+
+  existingStudent.fatherName =
+    studentToEdit.fatherName || existingStudent.fatherName;
+
+  existingStudent.schoolName =
+    studentToEdit.schoolName || existingStudent.schoolName;
+
+  existingStudent.educationalLevel =
+    studentToEdit.educationalLevel || existingStudent.educationalLevel;
+
+  await existingStudent.save();
+
+  res.status(200).json(existingStudent);
 };
 
 export const deleteStudents = async (req: Request, res: Response) => {
@@ -96,20 +104,14 @@ export const deleteStudents = async (req: Request, res: Response) => {
     throw new RequestValidationError(validationErrors.array());
   }
 
-  const id = new ObjectId(req.params.id);
+  const id = req.params.id;
 
-  const existingStudent = await collections.students!.findOne({ _id: id });
+  const existingStudent = await Student.findById(id);
 
   if (!existingStudent)
     throw new NotFoundError(`Student with id ${id} not found.`);
 
-  const result = await collections.students!.deleteOne({
-    _id: existingStudent._id,
-  });
-
-  if (!result || result.deletedCount < 1) {
-    throw new ServerError(`Failed to delete student with id ${id}.`);
-  }
+  await Student.deleteOne({ id });
 
   res
     .status(200)

@@ -1,4 +1,4 @@
-import Student from '@/models/student.model';
+import { StudentAttrs } from '@/models/student.model';
 
 export default [
   {
@@ -190,4 +190,4 @@ export default [
     schoolName: 'PQR School',
     educationalLevel: 'University',
   },
-] as Student[];
+] as StudentAttrs[];
