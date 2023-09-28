@@ -14,7 +14,6 @@ interface EditStudentRequest extends Request {
 }
 
 export const getAllStudents = async (_req: Request, res: Response) => {
-  // const studentsList = await collections.students!.find({}).toArray();
   const studentsList = await Student.find({});
 
   res.status(200).json(studentsList);
