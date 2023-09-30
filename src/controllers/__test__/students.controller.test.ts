@@ -5,6 +5,8 @@ import { validationResult, Result, ValidationError } from 'express-validator';
 import STUDENTS from '@/utils/dummyData';
 import {
   createStudent,
+  deleteStudent,
+  editStudents,
   getAllStudents,
   getStudent,
 } from '@/controllers/students.controller';
@@ -32,6 +34,9 @@ const createMockReq = () =>
   ({
     params: {
       id: 'validMongoId',
+    },
+    body: {
+      ...mockStudents()[0],
     },
   } as unknown as Request);
 
@@ -182,5 +187,179 @@ describe('createStudent', () => {
     await createStudent(req, res);
 
     expect(RequestValidationError).toHaveBeenCalled();
+  });
+});
+
+describe('editStudent', () => {
+  const existStudentToEdit = {
+    ...mockStudents()[0],
+    save: vi.fn(),
+  };
+
+  const mockEditStudent = {
+    firstName: 'editedFirstName',
+    lastName: 'editedLastName',
+    nationalCode: '123456',
+    phoneNumber: '123456789',
+    fatherName: 'editedFatherName',
+    schoolName: 'Edited School',
+    educationalLevel: 'Edited Educational Level',
+  };
+
+  const req = {
+    ...createMockReq(),
+    body: {
+      ...mockEditStudent,
+    },
+  } as unknown as Request;
+
+  it('should call RequestValidationError with req', async () => {
+    vi.spyOn(Student, 'findById').mockResolvedValueOnce(existStudentToEdit);
+    const res = createMockRes();
+
+    await editStudents(req, res);
+
+    expect(validationResult).toHaveBeenCalledWith(req);
+  });
+
+  it('should properly edit existing student with provided req.body when valid body is provided', async () => {
+    vi.spyOn(Student, 'findById').mockResolvedValueOnce(existStudentToEdit);
+
+    const res = createMockRes();
+
+    await editStudents(req, res);
+
+    expect(existStudentToEdit.save).toBeCalled();
+    expect(existStudentToEdit.firstName).toBe(mockEditStudent.firstName);
+    expect(existStudentToEdit.lastName).toBe(mockEditStudent.lastName);
+    expect(existStudentToEdit.nationalCode).toBe(mockEditStudent.nationalCode);
+    expect(existStudentToEdit.phoneNumber).toBe(mockEditStudent.phoneNumber);
+    expect(existStudentToEdit.fatherName).toBe(mockEditStudent.fatherName);
+    expect(existStudentToEdit.schoolName).toBe(mockEditStudent.schoolName);
+    expect(existStudentToEdit.educationalLevel).toBe(
+      mockEditStudent.educationalLevel
+    );
+    expect(existStudentToEdit.save).toBeCalled();
+  });
+
+  it('should return edited student in response with 200 status code when valid req.body provided', async () => {
+    vi.spyOn(Student, 'findById').mockResolvedValueOnce(existStudentToEdit);
+
+    const res = createMockRes();
+
+    await editStudents(req, res);
+
+    expect(res.status).toBeCalledWith(200);
+    expect(res.json).toBeCalledWith(existStudentToEdit);
+  });
+
+  it('should call a RequestValidationError when invalid student id provided in req.params', async () => {
+    vi.spyOn(Student, 'findById').mockResolvedValueOnce(existStudentToEdit);
+
+    mockValidationResult.mockReturnValue({
+      ...mockReturnedValidationResult,
+      isEmpty: () => false,
+    } as unknown as Result<ValidationError>);
+
+    const res = createMockRes();
+
+    await editStudents(req, res);
+
+    expect(RequestValidationError).toBeCalled();
+  });
+
+  it('should call a NotFoundError when a student does not exist with the provided student ID', async () => {
+    vi.spyOn(Student, 'findById').mockResolvedValueOnce(null);
+    const res = createMockRes();
+
+    await editStudents(req, res);
+
+    expect(NotFoundError).toBeCalled();
+  });
+});
+
+describe('deleteStudent', () => {
+  const mockDeleteResult = {
+    acknowledged: true,
+    deletedCount: 1,
+  };
+
+  it('should call validationResult with request', async () => {
+    vi.spyOn(Student, 'findById').mockResolvedValueOnce(mockStudents()[0]);
+    vi.spyOn(Student, 'deleteOne').mockResolvedValueOnce(mockDeleteResult);
+
+    const req = createMockReq();
+    const res = createMockRes();
+
+    await deleteStudent(req, res);
+
+    expect(validationResult).toBeCalledWith(req);
+  });
+
+  it('should call Student.findById with provided params.id', async () => {
+    vi.spyOn(Student, 'findById').mockResolvedValueOnce(mockStudents()[0]);
+    vi.spyOn(Student, 'deleteOne').mockResolvedValueOnce(mockDeleteResult);
+
+    const req = createMockReq();
+    const res = createMockRes();
+
+    await deleteStudent(req, res);
+
+    expect(Student.findById).toBeCalledWith(req.params.id);
+  });
+
+  it('should call Student.deleteOne with provided params.id', async () => {
+    vi.spyOn(Student, 'findById').mockResolvedValueOnce(mockStudents()[0]);
+    vi.spyOn(Student, 'deleteOne').mockResolvedValueOnce(mockDeleteResult);
+
+    const req = createMockReq();
+    const res = createMockRes();
+    const deleteQuery = { id: req.params.id };
+
+    await deleteStudent(req, res);
+
+    expect(Student.deleteOne).toBeCalledWith(deleteQuery);
+  });
+
+  it('should return response with status code 200 when student deleted successfully', async () => {
+    vi.spyOn(Student, 'findById').mockResolvedValueOnce(mockStudents()[0]);
+    vi.spyOn(Student, 'deleteOne').mockResolvedValueOnce(mockDeleteResult);
+
+    const req = createMockReq();
+    const res = createMockRes();
+
+    await deleteStudent(req, res);
+
+    expect(res.status).toBeCalledWith(200);
+    expect(res.json).toBeCalled();
+  });
+
+  it('should call RequestValidationError when invalid req.params.id provided', async () => {
+    vi.spyOn(Student, 'findById').mockResolvedValueOnce(mockStudents()[0]);
+    vi.spyOn(Student, 'deleteOne').mockResolvedValueOnce(mockDeleteResult);
+
+    mockValidationResult.mockReturnValue({
+      ...mockReturnedValidationResult,
+      isEmpty: () => false,
+    } as unknown as Result<ValidationError>);
+
+    const req = createMockReq();
+    const res = createMockRes();
+
+    await deleteStudent(req, res);
+
+    expect(RequestValidationError).toBeCalled();
+  });
+
+  it('should call NotFoundError when a student does not exist with the provided student ID', async () => {
+    vi.spyOn(Student, 'findById').mockResolvedValueOnce(null);
+    vi.spyOn(Student, 'deleteOne').mockResolvedValueOnce(mockDeleteResult);
+
+    const req = createMockReq();
+    const res = createMockRes();
+
+    await deleteStudent(req, res);
+
+    expect(NotFoundError).toBeCalled();
   });
 });

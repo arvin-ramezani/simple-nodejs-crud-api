@@ -58,62 +58,67 @@ export const createStudent = async (
 };
 
 export const editStudents = async (req: EditStudentRequest, res: Response) => {
-  const validationErrors = validationResult(req);
+  try {
+    const validationErrors = validationResult(req);
 
-  if (!validationErrors.isEmpty()) {
-    throw new RequestValidationError(validationErrors.array());
-  }
+    if (!validationErrors.isEmpty()) {
+      throw new RequestValidationError(validationErrors.array());
+    }
 
-  const id = req.params.id;
-  const studentToEdit = req.body;
+    const id = req.params.id;
+    const studentToEdit = req.body;
 
-  const existingStudent = await Student.findById(id);
+    const existingStudent = await Student.findById(id);
 
-  if (!existingStudent)
-    throw new NotFoundError(`Student with id ${id} not found.`);
+    if (!existingStudent)
+      throw new NotFoundError(`Student with id ${id} not found.`);
 
-  existingStudent.firstName =
-    studentToEdit.firstName || existingStudent.firstName;
+    existingStudent.firstName =
+      studentToEdit.firstName || existingStudent.firstName;
 
-  existingStudent.lastName = studentToEdit.lastName || existingStudent.lastName;
+    existingStudent.lastName =
+      studentToEdit.lastName || existingStudent.lastName;
 
-  existingStudent.nationalCode =
-    studentToEdit.nationalCode || existingStudent.nationalCode;
+    existingStudent.nationalCode =
+      studentToEdit.nationalCode || existingStudent.nationalCode;
 
-  existingStudent.phoneNumber =
-    studentToEdit.phoneNumber || existingStudent.phoneNumber;
+    existingStudent.phoneNumber =
+      studentToEdit.phoneNumber || existingStudent.phoneNumber;
 
-  existingStudent.fatherName =
-    studentToEdit.fatherName || existingStudent.fatherName;
+    existingStudent.fatherName =
+      studentToEdit.fatherName || existingStudent.fatherName;
 
-  existingStudent.schoolName =
-    studentToEdit.schoolName || existingStudent.schoolName;
+    existingStudent.schoolName =
+      studentToEdit.schoolName || existingStudent.schoolName;
 
-  existingStudent.educationalLevel =
-    studentToEdit.educationalLevel || existingStudent.educationalLevel;
+    existingStudent.educationalLevel =
+      studentToEdit.educationalLevel || existingStudent.educationalLevel;
 
-  await existingStudent.save();
+    await existingStudent.save();
 
-  res.status(200).json(existingStudent);
+    res.status(200).json(existingStudent);
+  } catch (error) {}
 };
 
-export const deleteStudents = async (req: Request, res: Response) => {
-  const validationErrors = validationResult(req);
+export const deleteStudent = async (req: Request, res: Response) => {
+  try {
+    const validationErrors = validationResult(req);
 
-  if (!validationErrors.isEmpty()) {
-    throw new RequestValidationError(validationErrors.array());
-  }
+    if (!validationErrors.isEmpty()) {
+      throw new RequestValidationError(validationErrors.array());
+    }
 
-  const id = req.params.id;
+    const id = req.params.id;
 
-  const existingStudent = await Student.findById(id);
+    const existingStudent = await Student.findById(id);
 
-  if (!existingStudent)
-    throw new NotFoundError(`Student with id ${id} not found.`);
+    if (!existingStudent)
+      throw new NotFoundError(`Student with id ${id} not found.`);
 
-  await Student.deleteOne({ id });
+    await Student.deleteOne({ id });
 
-  res
-    .status(200)
-    .json({ message: `Student with id ${id} deleted successfully.` });
+    res
+      .status(200)
+      .json({ message: `Student with id ${id} deleted successfully.` });
+  } catch (error) {}
 };
