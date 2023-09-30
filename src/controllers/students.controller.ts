@@ -4,7 +4,6 @@ import { validationResult } from 'express-validator';
 import { Student, StudentAttrs } from '@/models/student.model';
 import { RequestValidationError } from '@/errors/request-validation.error';
 import { NotFoundError } from '@/errors/not-found.error';
-import { ConflictError } from '@/errors/conflict.error';
 
 interface CreateStudentRequest extends Request {
   body: StudentAttrs;
@@ -21,47 +20,41 @@ export const getAllStudents = async (_req: Request, res: Response) => {
 };
 
 export const getStudent = async (req: Request, res: Response) => {
-  const validationErrors = validationResult(req);
+  try {
+    const validationErrors = validationResult(req);
 
-  if (!validationErrors.isEmpty()) {
-    throw new RequestValidationError(validationErrors.array());
-  }
+    if (!validationErrors.isEmpty()) {
+      throw new RequestValidationError(validationErrors.array());
+    }
 
-  const id = req.params.id;
+    const id = req.params.id;
 
-  const student = await Student.findById(id);
+    const student = await Student.findById(id);
 
-  if (!student) throw new NotFoundError(`Student with id ${id} not found.`);
+    if (!student) throw new NotFoundError(`Student with id ${id} not found.`);
 
-  res.status(200).json(student);
+    res.status(200).json(student);
+  } catch (error) {}
 };
 
 export const createStudent = async (
   req: CreateStudentRequest,
   res: Response
 ) => {
-  const validationErrors = validationResult(req);
+  try {
+    const validationErrors = validationResult(req);
 
-  if (!validationErrors.isEmpty()) {
-    throw new RequestValidationError(validationErrors.array());
-  }
+    if (!validationErrors.isEmpty()) {
+      throw new RequestValidationError(validationErrors.array());
+    }
 
-  const studentToCreate = req.body;
+    const studentToCreate = req.body;
 
-  const existStudent = await Student.findOne({
-    nationalCode: studentToCreate.nationalCode,
-  });
+    const newStudent = Student.build(studentToCreate);
+    await newStudent.save();
 
-  if (existStudent) {
-    throw new ConflictError(
-      `Student with NationalCode ${studentToCreate.nationalCode} already exists`
-    );
-  }
-
-  const newStudent = Student.build(studentToCreate);
-  await newStudent.save();
-
-  res.status(201).json(newStudent);
+    res.status(201).json(newStudent);
+  } catch (error) {}
 };
 
 export const editStudents = async (req: EditStudentRequest, res: Response) => {
