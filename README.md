@@ -39,6 +39,14 @@ To run the API in the development environment, execute the following command:
 yarn dev
 ```
 
+## Running the Tests:
+
+To run the tests, execute the following command:
+
+```shell
+yarn test
+```
+
 ## API Routes:
 
 The following routes are available for accessing the API:
@@ -75,6 +83,8 @@ The following libraries and tools are utilized in this API:
 5. **express-validator** - A middleware for Express.js that helps with request validation.
 6. **Swagger** - A tool for documenting APIs with interactive documentation and client SDK generation.
 7. **Vitest** - A JavaScript testing framework for unit tests.
+8. **Supertest** - A Node.js library that allows developers and testers to test the APIs.
+9. **mongodb-memory-server** - A library that provides a simple way to spin up an in-memory MongoDB server for testing purposes.
 
 ## Conclusion:
 
