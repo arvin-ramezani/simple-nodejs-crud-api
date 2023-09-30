@@ -1,4 +1,4 @@
-import { MockedFunction, vi } from 'vitest';
+import { vi } from 'vitest';
 
 export const validationResult = vi.fn(() => ({
   isEmpty: () => true,
