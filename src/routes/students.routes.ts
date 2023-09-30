@@ -6,7 +6,7 @@ import validateEditStudentMiddlewares from '@/middlewares/validate-edit-student.
 import validateDeleteStudentMiddlewares from '@/middlewares/validate-delete-student.middleware';
 import {
   createStudent,
-  deleteStudents,
+  deleteStudent,
   editStudents,
   getAllStudents,
   getStudent,
@@ -148,6 +148,6 @@ router.patch('/:id', validateEditStudentMiddlewares, editStudents);
  *      500:
  *        description: Something went wrong
  */
-router.delete('/:id', validateDeleteStudentMiddlewares, deleteStudents);
+router.delete('/:id', validateDeleteStudentMiddlewares, deleteStudent);
 
 export default router;
