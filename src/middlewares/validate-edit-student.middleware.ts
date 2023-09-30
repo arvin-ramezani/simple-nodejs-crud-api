@@ -8,6 +8,10 @@ export default [
       'Invalid request parameter: Please provide a valid MongoDB ObjectId for the student Id.'
     ),
 
+  body()
+    .custom((obj) => Object.keys(obj).length > 0)
+    .withMessage('Please provide at least one field.'),
+
   body('firstName')
     .optional()
     .notEmpty()

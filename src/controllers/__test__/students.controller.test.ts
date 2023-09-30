@@ -81,10 +81,11 @@ describe('getStudent', () => {
   it('should call validationResult and pass request as params to it', async () => {
     const req = createMockReq();
     const res = createMockRes();
+    const next = vi.fn();
 
     vi.spyOn(Student, 'findById').mockResolvedValueOnce(null);
 
-    await getStudent(req, res);
+    await getStudent(req, res, next);
 
     expect(validationResult).toHaveBeenCalledWith(req);
   });
@@ -94,8 +95,9 @@ describe('getStudent', () => {
 
     const req = createMockReq();
     const res = createMockRes();
+    const next = vi.fn();
 
-    await getStudent(req, res);
+    await getStudent(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(mockStudents()[0]);
@@ -106,13 +108,14 @@ describe('getStudent', () => {
 
     const req = (createMockReq().params.id = 'inValidId') as unknown as Request;
     const res = createMockRes();
+    const next = vi.fn();
 
     mockValidationResult.mockReturnValue({
       ...mockReturnedValidationResult,
       isEmpty: () => false,
     } as unknown as Result<ValidationError>);
 
-    await getStudent(req, res);
+    await getStudent(req, res, next);
 
     expect(RequestValidationError).toHaveBeenCalled();
   });
@@ -120,10 +123,11 @@ describe('getStudent', () => {
   it('should call NotFoundError when no student is found in database', async () => {
     const req = createMockReq();
     const res = createMockRes();
+    const next = vi.fn();
 
     vi.spyOn(Student, 'findById').mockResolvedValueOnce(null);
 
-    await getStudent(req, res);
+    await getStudent(req, res, next);
 
     expect(NotFoundError).toHaveBeenCalled();
   });
@@ -141,8 +145,9 @@ describe('createStudent', () => {
     const req = (createMockReq().body =
       mockStudents()[0] as unknown as Request);
     const res = createMockRes();
+    const next = vi.fn();
 
-    await createStudent(req, res);
+    await createStudent(req, res, next);
 
     expect(validationResult).toHaveBeenCalledWith(req);
   });
@@ -153,8 +158,9 @@ describe('createStudent', () => {
     const req = (createMockReq().body =
       mockStudents()[0] as unknown as Request);
     const res = createMockRes();
+    const next = vi.fn();
 
-    await createStudent(req, res);
+    await createStudent(req, res, next);
 
     expect(Student.build).toHaveBeenCalledWith(req.body);
     expect(mockCreatedStudent.save).toHaveBeenCalled();
@@ -166,8 +172,9 @@ describe('createStudent', () => {
     const req = (createMockReq().body =
       mockStudents()[0] as unknown as Request);
     const res = createMockRes();
+    const next = vi.fn();
 
-    await createStudent(req, res);
+    await createStudent(req, res, next);
 
     expect(res.status).toBeCalledWith(201);
     expect(res.json).toBeCalledWith(mockCreatedStudent);
@@ -178,13 +185,14 @@ describe('createStudent', () => {
 
     const req = createMockReq();
     const res = createMockRes();
+    const next = vi.fn();
 
     mockValidationResult.mockReturnValue({
       ...mockReturnedValidationResult,
       isEmpty: () => false,
     } as unknown as Result<ValidationError>);
 
-    await createStudent(req, res);
+    await createStudent(req, res, next);
 
     expect(RequestValidationError).toHaveBeenCalled();
   });
@@ -216,8 +224,9 @@ describe('editStudent', () => {
   it('should call RequestValidationError with req', async () => {
     vi.spyOn(Student, 'findById').mockResolvedValueOnce(existStudentToEdit);
     const res = createMockRes();
+    const next = vi.fn();
 
-    await editStudents(req, res);
+    await editStudents(req, res, next);
 
     expect(validationResult).toHaveBeenCalledWith(req);
   });
@@ -226,8 +235,9 @@ describe('editStudent', () => {
     vi.spyOn(Student, 'findById').mockResolvedValueOnce(existStudentToEdit);
 
     const res = createMockRes();
+    const next = vi.fn();
 
-    await editStudents(req, res);
+    await editStudents(req, res, next);
 
     expect(existStudentToEdit.save).toBeCalled();
     expect(existStudentToEdit.firstName).toBe(mockEditStudent.firstName);
@@ -246,8 +256,9 @@ describe('editStudent', () => {
     vi.spyOn(Student, 'findById').mockResolvedValueOnce(existStudentToEdit);
 
     const res = createMockRes();
+    const next = vi.fn();
 
-    await editStudents(req, res);
+    await editStudents(req, res, next);
 
     expect(res.status).toBeCalledWith(200);
     expect(res.json).toBeCalledWith(existStudentToEdit);
@@ -262,8 +273,9 @@ describe('editStudent', () => {
     } as unknown as Result<ValidationError>);
 
     const res = createMockRes();
+    const next = vi.fn();
 
-    await editStudents(req, res);
+    await editStudents(req, res, next);
 
     expect(RequestValidationError).toBeCalled();
   });
@@ -271,8 +283,9 @@ describe('editStudent', () => {
   it('should call a NotFoundError when a student does not exist with the provided student ID', async () => {
     vi.spyOn(Student, 'findById').mockResolvedValueOnce(null);
     const res = createMockRes();
+    const next = vi.fn();
 
-    await editStudents(req, res);
+    await editStudents(req, res, next);
 
     expect(NotFoundError).toBeCalled();
   });
@@ -290,8 +303,9 @@ describe('deleteStudent', () => {
 
     const req = createMockReq();
     const res = createMockRes();
+    const next = vi.fn();
 
-    await deleteStudent(req, res);
+    await deleteStudent(req, res, next);
 
     expect(validationResult).toBeCalledWith(req);
   });
@@ -302,8 +316,9 @@ describe('deleteStudent', () => {
 
     const req = createMockReq();
     const res = createMockRes();
+    const next = vi.fn();
 
-    await deleteStudent(req, res);
+    await deleteStudent(req, res, next);
 
     expect(Student.findById).toBeCalledWith(req.params.id);
   });
@@ -314,9 +329,11 @@ describe('deleteStudent', () => {
 
     const req = createMockReq();
     const res = createMockRes();
+    const next = vi.fn();
+
     const deleteQuery = { id: req.params.id };
 
-    await deleteStudent(req, res);
+    await deleteStudent(req, res, next);
 
     expect(Student.deleteOne).toBeCalledWith(deleteQuery);
   });
@@ -327,8 +344,9 @@ describe('deleteStudent', () => {
 
     const req = createMockReq();
     const res = createMockRes();
+    const next = vi.fn();
 
-    await deleteStudent(req, res);
+    await deleteStudent(req, res, next);
 
     expect(res.status).toBeCalledWith(200);
     expect(res.json).toBeCalled();
@@ -345,8 +363,9 @@ describe('deleteStudent', () => {
 
     const req = createMockReq();
     const res = createMockRes();
+    const next = vi.fn();
 
-    await deleteStudent(req, res);
+    await deleteStudent(req, res, next);
 
     expect(RequestValidationError).toBeCalled();
   });
@@ -357,8 +376,9 @@ describe('deleteStudent', () => {
 
     const req = createMockReq();
     const res = createMockRes();
+    const next = vi.fn();
 
-    await deleteStudent(req, res);
+    await deleteStudent(req, res, next);
 
     expect(NotFoundError).toBeCalled();
   });

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 
 import { Student, StudentAttrs } from '@/models/student.model';
@@ -19,7 +19,11 @@ export const getAllStudents = async (_req: Request, res: Response) => {
   res.status(200).json(studentsList);
 };
 
-export const getStudent = async (req: Request, res: Response) => {
+export const getStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const validationErrors = validationResult(req);
 
@@ -34,12 +38,15 @@ export const getStudent = async (req: Request, res: Response) => {
     if (!student) throw new NotFoundError(`Student with id ${id} not found.`);
 
     res.status(200).json(student);
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const createStudent = async (
   req: CreateStudentRequest,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
     const validationErrors = validationResult(req);
@@ -54,10 +61,16 @@ export const createStudent = async (
     await newStudent.save();
 
     res.status(201).json(newStudent);
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const editStudents = async (req: EditStudentRequest, res: Response) => {
+export const editStudents = async (
+  req: EditStudentRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const validationErrors = validationResult(req);
 
@@ -97,10 +110,16 @@ export const editStudents = async (req: EditStudentRequest, res: Response) => {
     await existingStudent.save();
 
     res.status(200).json(existingStudent);
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const deleteStudent = async (req: Request, res: Response) => {
+export const deleteStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const validationErrors = validationResult(req);
 
@@ -120,5 +139,7 @@ export const deleteStudent = async (req: Request, res: Response) => {
     res
       .status(200)
       .json({ message: `Student with id ${id} deleted successfully.` });
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+  }
 };
